@@ -12,5 +12,10 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Api.Entitys\Api.Entitys.csproj" />
+    <ProjectReference Include="..\Api.Services\Api.Services.csproj" />
+  </ItemGroup>
+
 
 </Project>

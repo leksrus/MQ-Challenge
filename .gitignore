@@ -5,3 +5,5 @@
 /.vs/WebApi
 /WebApi/bin/Debug/netcoreapp3.1
 /WebApi/obj
+/Api.Entitys/obj
+/Api.Services/obj
