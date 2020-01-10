@@ -8,9 +8,39 @@ namespace WebApi.Controllers
 {
     public class ProductController : Controller
     {
-        public IActionResult Index()
+        [HttpGet]
+        [Route("/api/[Controller]")]
+        public IActionResult Get()
         {
-            return View();
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("/api/[Controller]")]
+        public IActionResult Post()
+        {
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("/api/[Controller]")]
+        public IActionResult Put()
+        {
+            return Ok();
+        }
+
+        [HttpPatch]
+        [Route("/api/[Controller]")]
+        public IActionResult Patch()
+        {
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("/api/[Controller]")]
+        public IActionResult Delete()
+        {
+            return Ok();
         }
     }
 }
