@@ -7,3 +7,5 @@
 /WebApi/obj
 /Api.Entitys/obj
 /Api.Services/obj
+/Api.Services/bin/Debug/netcoreapp3.1
+/Api.Entitys/bin/Debug/netcoreapp3.1
