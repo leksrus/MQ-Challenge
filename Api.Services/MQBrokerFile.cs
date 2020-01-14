@@ -34,7 +34,10 @@ namespace Api.Services
                 var message = new Message();
                 var line = lines[i];
                 var values = line.Split(";");
-                message.HttpStatusCode = (HttpStatusCode)Convert.ToInt32(values[0]);
+                message.Id = Convert.ToString(values[0]);
+                message.HttpStatusCode = (HttpStatusCode)Convert.ToInt32(values[1]);
+                message.Product.Id = Convert.ToInt32(values[2]);
+                message.Product.Name = values[3];
                 messages.Add(message);
             }
             _logger.LogInformation("Total messages: " + lines.Length);
