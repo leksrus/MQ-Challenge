@@ -1,4 +1,6 @@
 using Api.Entitys;
+using Api.Services;
+using Api.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -25,6 +27,7 @@ namespace WebApi
             services.Configure<MQConfig>(_configuration.GetSection("MQConfig"));
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            services.AddSingleton<ICryptoManager, CryptoManager>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

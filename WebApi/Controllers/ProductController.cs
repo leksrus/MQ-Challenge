@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Api.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using WebApi.Helpers;
@@ -9,11 +10,13 @@ namespace WebApi.Controllers
     {
         private readonly ILogger<ProductController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICryptoManager _cryptoManager;
 
-        public ProductController(ILogger<ProductController> logger, IHttpContextAccessor httpContextAccessor)
+        public ProductController(ILogger<ProductController> logger, IHttpContextAccessor httpContextAccessor, ICryptoManager cryptoManager)
         {
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
+            _cryptoManager = cryptoManager;
         }
 
         [HttpGet]
@@ -21,6 +24,7 @@ namespace WebApi.Controllers
         public IActionResult Get()
         {
             var url = nameof(HttpMethods.Get) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
+            var keyRequest = _cryptoManager.GetMD5Hash(url);
             _logger.LogInformation(url);
 
             return Ok();
@@ -31,6 +35,7 @@ namespace WebApi.Controllers
         public IActionResult Post()
         {
             var url = nameof(HttpMethods.Post) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
+            var keyRequest = _cryptoManager.GetMD5Hash(url);
             _logger.LogInformation(url);
 
             return Ok();
@@ -41,6 +46,7 @@ namespace WebApi.Controllers
         public IActionResult Put()
         {
             var url = nameof(HttpMethods.Put) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
+            var keyRequest = _cryptoManager.GetMD5Hash(url);
             _logger.LogInformation(url);
 
             return Ok();
@@ -51,6 +57,7 @@ namespace WebApi.Controllers
         public IActionResult Patch()
         {
             var url = nameof(HttpMethods.Patch) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
+            var keyRequest = _cryptoManager.GetMD5Hash(url);
             _logger.LogInformation(url);
 
             return Ok();
@@ -61,6 +68,7 @@ namespace WebApi.Controllers
         public IActionResult Delete()
         {
             var url = nameof(HttpMethods.Delete) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
+            var keyRequest = _cryptoManager.GetMD5Hash(url);
             _logger.LogInformation(url);
 
             return Ok();
