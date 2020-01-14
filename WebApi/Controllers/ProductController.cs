@@ -1,26 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Api.Services.Interfaces;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using WebApi.Helpers;
 
 namespace WebApi.Controllers
 {
     public class ProductController : Controller
     {
         private readonly ILogger<ProductController> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ICryptoManager _cryptoManager;
 
-        public ProductController(ILogger<ProductController> logger)
+        public ProductController(ILogger<ProductController> logger, IHttpContextAccessor httpContextAccessor, ICryptoManager cryptoManager)
         {
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
+            _cryptoManager = cryptoManager;
         }
 
         [HttpGet]
         [Route("/api/[Controller]")]
         public IActionResult Get()
         {
-            _logger.LogInformation("Get request /api/product");
+            var url = nameof(HttpMethods.Get) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
+            var keyRequest = _cryptoManager.GetMD5Hash(url);
+            _logger.LogInformation(url);
 
             return Ok();
         }
@@ -29,7 +34,9 @@ namespace WebApi.Controllers
         [Route("/api/[Controller]")]
         public IActionResult Post()
         {
-            _logger.LogInformation("Post request /api/product");
+            var url = nameof(HttpMethods.Post) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
+            var keyRequest = _cryptoManager.GetMD5Hash(url);
+            _logger.LogInformation(url);
 
             return Ok();
         }
@@ -38,7 +45,9 @@ namespace WebApi.Controllers
         [Route("/api/[Controller]")]
         public IActionResult Put()
         {
-            _logger.LogInformation("Put request /api/product");
+            var url = nameof(HttpMethods.Put) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
+            var keyRequest = _cryptoManager.GetMD5Hash(url);
+            _logger.LogInformation(url);
 
             return Ok();
         }
@@ -47,7 +56,9 @@ namespace WebApi.Controllers
         [Route("/api/[Controller]")]
         public IActionResult Patch()
         {
-            _logger.LogInformation("Patch request /api/product");
+            var url = nameof(HttpMethods.Patch) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
+            var keyRequest = _cryptoManager.GetMD5Hash(url);
+            _logger.LogInformation(url);
 
             return Ok();
         }
@@ -56,7 +67,9 @@ namespace WebApi.Controllers
         [Route("/api/[Controller]")]
         public IActionResult Delete()
         {
-            _logger.LogInformation("Delete request /api/product");
+            var url = nameof(HttpMethods.Delete) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
+            var keyRequest = _cryptoManager.GetMD5Hash(url);
+            _logger.LogInformation(url);
 
             return Ok();
         }
