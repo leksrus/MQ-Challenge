@@ -1,11 +1,13 @@
 ﻿using Api.Entitys;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Api.Services.Interfaces
 {
     public interface IMQBroker
     {
-        void PutMessage(Message message);
+        Task PutMessage(Message message);
 
-        Message GetMessage();
+        Task<List<Message>> GetMessages();
     }
 }
