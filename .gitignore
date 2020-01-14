@@ -9,3 +9,6 @@
 /Api.Services/obj
 /Api.Services/bin/Debug/netcoreapp3.1
 /Api.Entitys/bin/Debug/netcoreapp3.1
+/Api.Tests/bin/Debug/netcoreapp3.1
+/Api.Tests/obj/Debug/netcoreapp3.1
+/Api.Tests/obj
