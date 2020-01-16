@@ -45,21 +45,53 @@ namespace Api.Services
             return messages;
         }
 
-        public async Task PutMessage(Message message)
+        public async Task<bool> PutMessage(Message message)
         {
             _logger.LogInformation("Putting message");
             var fileMQ = _options.Value.FilesRoute + _options.Value.InputData;
-            using var file = new StreamWriter(fileMQ);
-            await file.WriteAsync(MessageToString(message));
-            _logger.LogInformation("Message is in broker");
+
+            try
+            {
+                using var file = new StreamWriter(fileMQ);
+                await file.WriteAsync(MessageToString(message));
+                file.Close();
+                _logger.LogInformation("Message is in broker");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Error putting message: " + ex.Message);
+
+                return false;
+            }
+
         }
 
-        private string MessageToString(Message message)
+        private string MessageToString(object obj)
         {
             var sb = new StringBuilder();
-            sb.Append(message.Id + ";");
-            sb.Append(message.Product.Id + ";");
-            sb.Append(message.Product.Name + ";");
+            foreach (var prop in obj.GetType().GetProperties())
+            {
+                var propValue = prop.GetValue(obj, null);
+                if (prop.PropertyType != typeof(HttpStatusCode))
+                {
+                    if (prop.PropertyType != typeof(string) && prop.PropertyType.IsClass)
+                    {
+                        foreach (var subProp in prop.PropertyType.GetProperties())
+                        {
+                            var subPropValue = subProp.GetValue(propValue, null);
+                            if (subPropValue != null && !string.IsNullOrEmpty(subPropValue.ToString()))
+                                sb.Append(subPropValue + ";");
+                        }
+                    }
+                    else
+                    {
+                        if (propValue != null || !string.IsNullOrEmpty(propValue.ToString()))
+                            sb.Append(propValue + ";");
+                    }
+                }
+            }
 
             return sb.ToString();
         }
