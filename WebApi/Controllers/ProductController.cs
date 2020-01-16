@@ -1,8 +1,10 @@
 ﻿using Api.Entitys;
 using Api.Services.Interfaces;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using System.Threading.Tasks;
 using WebApi.Helpers;
 
 namespace WebApi.Controllers
@@ -13,38 +15,41 @@ namespace WebApi.Controllers
         private readonly ILogger<ProductController> _logger;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICryptoManager _cryptoManager;
-        private readonly IFileManager _fileManager;
+        private readonly IMapper _mapper;
         private readonly IMQBroker _mqBroker;
 
-        public ProductController(ILogger<ProductController> logger, IHttpContextAccessor httpContextAccessor, ICryptoManager cryptoManager, IFileManager fileManager,
+        public ProductController(ILogger<ProductController> logger, IHttpContextAccessor httpContextAccessor, ICryptoManager cryptoManager, IMapper mapper,
                                   IMQBroker mqBroker)
         {
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _cryptoManager = cryptoManager;
-            _fileManager = fileManager;
+            _mapper = mapper;
             _mqBroker = mqBroker;
         }
 
         [HttpGet("{idProduct}")]
-        public IActionResult Get(int idProduct)
+        public async Task<IActionResult> Get(int idProduct)
         {
             var url = nameof(HttpMethods.Get) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
             var keyRequest = _cryptoManager.GetMD5Hash(url);
-            _fileManager.CreateFile();
             var message = new Message
             {
                 Id = keyRequest,
                 Product = new Product
                 {
-                     Id = idProduct
+                    Id = idProduct
                 }
             };
-            _mqBroker.PutMessage(message);
+
+            var putMsgResult = await _mqBroker.PutMessage(message);
+
+            if(putMsgResult)
+                return Ok();
 
             _logger.LogInformation(url);
 
-            return Ok();
+            return BadRequest();
         }
 
         [HttpPost]

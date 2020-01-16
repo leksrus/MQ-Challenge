@@ -45,13 +45,27 @@ namespace Api.Services
             return messages;
         }
 
-        public async Task PutMessage(Message message)
+        public async Task<bool> PutMessage(Message message)
         {
             _logger.LogInformation("Putting message");
             var fileMQ = _options.Value.FilesRoute + _options.Value.InputData;
-            using var file = new StreamWriter(fileMQ);
-            await file.WriteAsync(MessageToString(message));
-            _logger.LogInformation("Message is in broker");
+
+            try
+            {
+                using var file = new StreamWriter(fileMQ);
+                await file.WriteAsync(MessageToString(message));
+                file.Close();
+                _logger.LogInformation("Message is in broker");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Error putting message: " + ex.Message);
+
+                return false;
+            }
+
         }
 
         private string MessageToString(object obj)

@@ -1,6 +1,7 @@
 using Api.Entitys;
 using Api.Services;
 using Api.Services.Interfaces;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -24,6 +25,7 @@ namespace WebApi
         {
             services.AddControllers();
 
+            services.AddAutoMapper(typeof(Startup));
             services.Configure<MQConfig>(_configuration.GetSection("MQConfig"));
 
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
@@ -33,7 +35,7 @@ namespace WebApi
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime hostAppLifetime)
         {
             if (env.IsDevelopment())
             {
@@ -50,6 +52,17 @@ namespace WebApi
             {
                 endpoints.MapControllers();
             });
+
+            hostAppLifetime.ApplicationStarted.Register(() =>  {
+                var fileManager = (IFileManager)app.ApplicationServices.GetService(typeof(IFileManager));
+                fileManager.CreateFile();
+            });
+
+            hostAppLifetime.ApplicationStopped.Register(() =>  {
+                var fileManager = (IFileManager)app.ApplicationServices.GetService(typeof(IFileManager));
+                fileManager.DelteFiles();
+            });
         }
+
     }
 }

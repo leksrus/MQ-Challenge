@@ -6,7 +6,7 @@ namespace Api.Services.Interfaces
 {
     public interface IMQBroker
     {
-        Task PutMessage(Message message);
+        Task<bool> PutMessage(Message message);
 
         Task<List<Message>> GetMessages();
     }
