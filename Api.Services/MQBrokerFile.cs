@@ -54,12 +54,30 @@ namespace Api.Services
             _logger.LogInformation("Message is in broker");
         }
 
-        private string MessageToString(Message message)
+        private string MessageToString(object obj)
         {
             var sb = new StringBuilder();
-            sb.Append(message.Id + ";");
-            sb.Append(message.Product.Id + ";");
-            sb.Append(message.Product.Name + ";");
+            foreach (var prop in obj.GetType().GetProperties())
+            {
+                var propValue = prop.GetValue(obj, null);
+                if (prop.PropertyType != typeof(HttpStatusCode))
+                {
+                    if (prop.PropertyType != typeof(string) && prop.PropertyType.IsClass)
+                    {
+                        foreach (var subProp in prop.PropertyType.GetProperties())
+                        {
+                            var subPropValue = subProp.GetValue(propValue, null);
+                            if (subPropValue != null && !string.IsNullOrEmpty(subPropValue.ToString()))
+                                sb.Append(subPropValue + ";");
+                        }
+                    }
+                    else
+                    {
+                        if (propValue != null || !string.IsNullOrEmpty(propValue.ToString()))
+                            sb.Append(propValue + ";");
+                    }
+                }
+            }
 
             return sb.ToString();
         }
