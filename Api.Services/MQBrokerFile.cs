@@ -13,20 +13,19 @@ namespace Api.Services
 {
     public class MQBrokerFile : IMQBroker
     {
-        private readonly IOptions<MQConfig> _options;
+        private readonly IFileManager _fileManager;
         private readonly ILogger<MQBrokerFile> _logger;
 
-        public MQBrokerFile(IOptions<MQConfig> options, ILogger<MQBrokerFile> logger)
+        public MQBrokerFile(IFileManager fileManager, ILogger<MQBrokerFile> logger)
         {
-            _options = options;
+            _fileManager = fileManager;
             _logger = logger;
         }
 
         public async Task<List<Message>> GetMessages()
         {
             _logger.LogInformation("Getting messages");
-            var fileMQ = _options.Value.FilesRoute + _options.Value.InputData;
-            var lines = await File.ReadAllLinesAsync(fileMQ);
+            var lines = await _fileManager.GetAllLinesAsync();
             var messages = new List<Message>();
 
             for (int i = 0; i > lines.Length; i++)
@@ -48,24 +47,19 @@ namespace Api.Services
         public async Task<bool> PutMessage(Message message)
         {
             _logger.LogInformation("Putting message");
-            var fileMQ = _options.Value.FilesRoute + _options.Value.InputData;
 
-            try
+            var result = await _fileManager.SaveToFileAsync(MessageToString(message));
+
+            if (result)
             {
-                using var file = new StreamWriter(fileMQ, true);
-                await file.WriteLineAsync(MessageToString(message));
-                file.Close();
                 _logger.LogInformation("Message is in broker");
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogInformation("Error putting message: " + ex.Message);
 
                 return false;
             }
 
+            _logger.LogInformation("Error putting message");
+
+            return true;
         }
 
         private string MessageToString(object obj)

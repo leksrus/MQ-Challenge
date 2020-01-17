@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Api.Services
 {
@@ -53,10 +54,56 @@ namespace Api.Services
             }
             catch (Exception ex)
             {
-                 _logger.LogError("Files delete failed " + ex.Message);
+                _logger.LogError("Files delete failed " + ex.Message);
 
                 return false;
             }
+        }
+
+        public async Task<bool> SaveToFileAsync(string message)
+        {
+            var fileMQ = _options.Value.FilesRoute + _options.Value.InputData;
+
+            _logger.LogInformation("Saving message to file");
+
+
+            try
+            {
+                await using var file = new StreamWriter(fileMQ, true);
+                await file.WriteLineAsync(message);
+                file.Close();
+                _logger.LogInformation("Message saved");
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Error saving to file: " + ex.Message);
+
+                return false;
+            }
+
+        }
+
+        public async Task<Array> GetAllLinesAsync()
+        {
+            _logger.LogInformation("Getting text");
+            var fileMQ = _options.Value.FilesRoute + _options.Value.InputData;
+            try
+            {
+                var lines = await File.ReadAllLinesAsync(fileMQ);
+                _logger.LogInformation("Get messages Ok");
+
+                return lines;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation("Fail to get text: " + ex.Message);
+               return new string [0];
+            }
+
+
+
         }
     }
 }
