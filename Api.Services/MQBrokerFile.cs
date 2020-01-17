@@ -52,8 +52,8 @@ namespace Api.Services
 
             try
             {
-                using var file = new StreamWriter(fileMQ);
-                await file.WriteAsync(MessageToString(message));
+                using var file = new StreamWriter(fileMQ, true);
+                await file.WriteLineAsync(MessageToString(message));
                 file.Close();
                 _logger.LogInformation("Message is in broker");
 
