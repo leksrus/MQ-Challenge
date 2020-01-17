@@ -85,7 +85,7 @@ namespace Api.Services
 
         }
 
-        public async Task<Array> GetAllLinesAsync()
+        public async Task<string[]> GetAllLinesAsync()
         {
             _logger.LogInformation("Getting text");
             var fileMQ = _options.Value.FilesRoute + _options.Value.InputData;
