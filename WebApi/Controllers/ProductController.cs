@@ -82,8 +82,8 @@ namespace WebApi.Controllers
             return Ok();
         }
 
-        [HttpDelete]
-        public IActionResult Delete()
+        [HttpDelete("{idProduct}")]
+        public IActionResult Delete(int idProduct)
         {
             var url = nameof(HttpMethods.Delete) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
             var keyRequest = _cryptoManager.GetMD5Hash(url);

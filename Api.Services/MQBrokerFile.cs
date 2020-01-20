@@ -54,15 +54,14 @@ namespace Api.Services
             {
                 _logger.LogInformation("Message is in broker");
 
-                return false;
+                return true;
             }
-
             _logger.LogInformation("Error putting message");
 
             return true;
         }
 
-        private string MessageToString(object obj)
+        public string MessageToString(object obj)
         {
             var sb = new StringBuilder();
             foreach (var prop in obj.GetType().GetProperties())

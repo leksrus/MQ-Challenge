@@ -54,12 +54,12 @@ namespace WebApi
             });
 
             hostAppLifetime.ApplicationStarted.Register(() =>  {
-                var fileManager = (IFileManager)app.ApplicationServices.GetService(typeof(IFileManager));
+                var fileManager = app.ApplicationServices.GetService<IFileManager>();
                 fileManager.CreateFile();
             });
 
             hostAppLifetime.ApplicationStopped.Register(() =>  {
-                var fileManager = (IFileManager)app.ApplicationServices.GetService(typeof(IFileManager));
+                var fileManager = app.ApplicationServices.GetService<IFileManager>();
                 fileManager.DelteFiles();
             });
         }

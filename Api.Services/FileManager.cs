@@ -63,9 +63,7 @@ namespace Api.Services
         public async Task<bool> SaveToFileAsync(string message)
         {
             var fileMQ = _options.Value.FilesRoute + _options.Value.InputData;
-
             _logger.LogInformation("Saving message to file");
-
 
             try
             {
@@ -82,7 +80,6 @@ namespace Api.Services
 
                 return false;
             }
-
         }
 
         public async Task<string[]> GetAllLinesAsync()
