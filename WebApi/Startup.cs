@@ -33,6 +33,7 @@ namespace WebApi
             services.AddSingleton<ICryptoManager, CryptoManager>();
             services.AddSingleton<IFileManager, FileManager>();
             services.AddSingleton<IMQBroker, MQBrokerFile>();
+            services.AddSingleton<ICustomMemoryCache, CustomMemoryCache>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

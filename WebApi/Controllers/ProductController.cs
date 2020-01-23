@@ -17,15 +17,17 @@ namespace WebApi.Controllers
         private readonly ICryptoManager _cryptoManager;
         private readonly IMapper _mapper;
         private readonly IMQBroker _mqBroker;
+        private readonly ICustomMemoryCache _customMemoryCache;
 
         public ProductController(ILogger<ProductController> logger, IHttpContextAccessor httpContextAccessor, ICryptoManager cryptoManager, IMapper mapper,
-                                  IMQBroker mqBroker)
+                                  IMQBroker mqBroker, ICustomMemoryCache customMemoryCache)
         {
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _cryptoManager = cryptoManager;
             _mapper = mapper;
             _mqBroker = mqBroker;
+            _customMemoryCache = customMemoryCache;
         }
 
         [HttpGet("{idProduct}")]
