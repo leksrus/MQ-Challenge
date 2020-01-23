@@ -24,6 +24,7 @@ namespace WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddMemoryCache();
 
             services.AddAutoMapper(typeof(Startup));
             services.Configure<MQConfig>(_configuration.GetSection("MQConfig"));
