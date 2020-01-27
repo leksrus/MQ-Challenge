@@ -28,13 +28,16 @@ namespace Api.Services
             var lines = await _fileManager.GetAllLinesAsync();
             var messages = new List<Message>();
 
-            for (int i = 0; i > lines.Length; i++)
+            for (int i = 0; i < lines.Length; i++)
             {
-                var message = new Message();
+                var message = new Message
+                {
+                    Product = new Product()
+                };
                 var line = lines[i];
                 var values = line.Split(";");
-                message.Id = Convert.ToString(values[0]);
-                message.HttpStatusCode = (HttpStatusCode)Convert.ToInt32(values[1]);
+                message.HttpStatusCode = (HttpStatusCode)Convert.ToInt32(values[0]);
+                message.Id = Convert.ToString(values[1]);
                 message.Product.Id = Convert.ToInt32(values[2]);
                 message.Product.Name = values[3];
                 messages.Add(message);
