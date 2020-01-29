@@ -136,7 +136,7 @@ namespace Api.Tests
 
         private string[] GetResponseMessage()
         {
-            return new string[] { $"200;{_idGet};1;T-Shirt;" };
+            return new [] { $"200;{_idGet};1;T-Shirt;" };
         }
 
         [Fact]
@@ -165,7 +165,7 @@ namespace Api.Tests
 
         private string[] GetResponseMessageEmpty()
         {
-            return new string[] { $"200;{_idGet};0;;" };
+            return new [] { $"200;{_idGet};0;;" };
         }
 
         [Fact]
@@ -194,7 +194,7 @@ namespace Api.Tests
 
         private string[] PostResponseMessage()
         {
-            return new string[] { $"201;{_idPost};1;T-Shirt;" };
+            return new [] { $"201;{_idPost};1;T-Shirt;" };
         }
     }
 }
