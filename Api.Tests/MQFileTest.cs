@@ -136,7 +136,7 @@ namespace Api.Tests
 
         private string[] GetResponseMessage()
         {
-            return new [] { $"200;{_idGet};1;T-Shirt;" };
+            return new[] { $"200;{_idGet};1;T-Shirt;" };
         }
 
         [Fact]
@@ -147,7 +147,7 @@ namespace Api.Tests
             var msg = new Message
             {
                 Id = _idGet,
-                HttpStatusCode = HttpStatusCode.OK,
+                HttpStatusCode = HttpStatusCode.NotFound,
                 Product = new Product
                 {
                     Id = 0,
@@ -165,7 +165,7 @@ namespace Api.Tests
 
         private string[] GetResponseMessageEmpty()
         {
-            return new [] { $"200;{_idGet};0;;" };
+            return new[] { $"404;{_idGet};0;;" };
         }
 
         [Fact]
@@ -194,7 +194,94 @@ namespace Api.Tests
 
         private string[] PostResponseMessage()
         {
-            return new [] { $"201;{_idPost};1;T-Shirt;" };
+            return new[] { $"201;{_idPost};1;T-Shirt;" };
+        }
+
+        [Fact]
+        public async Task PostMessageError()
+        {
+            var mockFileManager = _fileManagerMock as Mock<IFileManager>;
+            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(PostResponseMessageError());
+            var msg = new Message
+            {
+                Id = _idPost,
+                HttpStatusCode = HttpStatusCode.BadRequest,
+                Product = new Product
+                {
+                    Id = 0,
+                    Name = string.Empty
+                }
+            };
+            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var message = await mqBroker.GetMessages();
+
+            var expected = JsonSerializer.Serialize(msg);
+            var actual = JsonSerializer.Serialize(message.First());
+
+            Assert.Equal(expected, actual);
+        }
+
+        private string[] PostResponseMessageError()
+        {
+            return new[] { $"400;{_idPost};0;;" };
+        }
+
+        [Fact]
+        public async Task PatchMessage()
+        {
+            var mockFileManager = _fileManagerMock as Mock<IFileManager>;
+            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(PatchResponseMessage());
+            var msg = new Message
+            {
+                Id = _idPatch,
+                HttpStatusCode = HttpStatusCode.OK,
+                Product = new Product
+                {
+                    Id = 0,
+                    Name = string.Empty
+                }
+            };
+            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var message = await mqBroker.GetMessages();
+
+            var expected = JsonSerializer.Serialize(msg);
+            var actual = JsonSerializer.Serialize(message.First());
+
+            Assert.Equal(expected, actual);
+        }
+
+        private string[] PatchResponseMessage()
+        {
+            return new[] { $"200;{_idPatch};0;;" };
+        }
+
+        [Fact]
+        public async Task PatchMessageError()
+        {
+            var mockFileManager = _fileManagerMock as Mock<IFileManager>;
+            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(PatchResponseMessageError());
+            var msg = new Message
+            {
+                Id = _idPatch,
+                HttpStatusCode = HttpStatusCode.BadRequest,
+                Product = new Product
+                {
+                    Id = 0,
+                    Name = string.Empty
+                }
+            };
+            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var message = await mqBroker.GetMessages();
+
+            var expected = JsonSerializer.Serialize(msg);
+            var actual = JsonSerializer.Serialize(message.First());
+
+            Assert.Equal(expected, actual);
+        }
+
+        private string[] PatchResponseMessageError()
+        {
+            return new[] { $"400;{_idPatch};0;;" };
         }
     }
 }
