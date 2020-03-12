@@ -283,5 +283,63 @@ namespace Api.Tests
         {
             return new[] { $"400;{_idPatch};0;;" };
         }
+
+        [Fact]
+        public async Task DeleteMessage()
+        {
+            var mockFileManager = _fileManagerMock as Mock<IFileManager>;
+            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(DeleteResponseMessage());
+            var msg = new Message
+            {
+                Id = _idDelete,
+                HttpStatusCode = HttpStatusCode.OK,
+                Product = new Product
+                {
+                    Id = 0,
+                    Name = string.Empty
+                }
+            };
+            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var message = await mqBroker.GetMessages();
+
+            var expected = JsonSerializer.Serialize(msg);
+            var actual = JsonSerializer.Serialize(message.First());
+
+            Assert.Equal(expected, actual);
+        }
+
+        private string[] DeleteResponseMessage()
+        {
+            return new[] { $"200;{_idDelete};0;;" };
+        }
+
+        [Fact]
+        public async Task DeleteMessageError()
+        {
+            var mockFileManager = _fileManagerMock as Mock<IFileManager>;
+            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(DeleteResponseMessageError());
+            var msg = new Message
+            {
+                Id = _idDelete,
+                HttpStatusCode = HttpStatusCode.BadRequest,
+                Product = new Product
+                {
+                    Id = 0,
+                    Name = string.Empty
+                }
+            };
+            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var message = await mqBroker.GetMessages();
+
+            var expected = JsonSerializer.Serialize(msg);
+            var actual = JsonSerializer.Serialize(message.First());
+
+            Assert.Equal(expected, actual);
+        }
+
+        private string[] DeleteResponseMessageError()
+        {
+            return new[] { $"400;{_idDelete};0;;" };
+        }
     }
 }
