@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Api.Services
 {
-    public class MQBrokerFile : IMQBroker
+    public class MqBrokerFile : IMQBroker
     {
         private readonly IFileManager _fileManager;
-        private readonly ILogger<MQBrokerFile> _logger;
+        private readonly ILogger<MqBrokerFile> _logger;
 
-        public MQBrokerFile(IFileManager fileManager, ILogger<MQBrokerFile> logger)
+        public MqBrokerFile(IFileManager fileManager, ILogger<MqBrokerFile> logger)
         {
             _fileManager = fileManager;
             _logger = logger;
@@ -26,13 +26,13 @@ namespace Api.Services
             var lines = await _fileManager.GetAllLinesAsync();
             var messages = new List<Message>();
 
-            for (int i = 0; i < lines.Length; i++)
+            foreach (var t in lines)
             {
                 var message = new Message
                 {
                     Product = new Product()
                 };
-                var line = lines[i];
+                var line = t;
                 var values = line.Split(";");
                 message.HttpStatusCode = (HttpStatusCode)Convert.ToInt32(values[0]);
                 message.Id = Convert.ToString(values[1]);
@@ -68,22 +68,20 @@ namespace Api.Services
             foreach (var prop in obj.GetType().GetProperties())
             {
                 var propValue = prop.GetValue(obj, null);
-                if (prop.PropertyType != typeof(HttpStatusCode))
+                if (prop.PropertyType == typeof(HttpStatusCode)) continue;
+                if (prop.PropertyType != typeof(string) && prop.PropertyType.IsClass)
                 {
-                    if (prop.PropertyType != typeof(string) && prop.PropertyType.IsClass)
+                    foreach (var subProp in prop.PropertyType.GetProperties())
                     {
-                        foreach (var subProp in prop.PropertyType.GetProperties())
-                        {
-                            var subPropValue = subProp.GetValue(propValue, null);
-                            if (subPropValue != null && !string.IsNullOrEmpty(subPropValue.ToString()))
-                                sb.Append(subPropValue + ";");
-                        }
+                        var subPropValue = subProp.GetValue(propValue, null);
+                        if (subPropValue != null && !string.IsNullOrEmpty(subPropValue.ToString()))
+                            sb.Append(subPropValue + ";");
                     }
-                    else
-                    {
-                        if (propValue != null || !string.IsNullOrEmpty(propValue.ToString()))
-                            sb.Append(propValue + ";");
-                    }
+                }
+                else
+                {
+                    if (propValue != null || !string.IsNullOrEmpty(propValue.ToString()))
+                        sb.Append(propValue + ";");
                 }
             }
 

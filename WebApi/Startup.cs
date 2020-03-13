@@ -32,7 +32,7 @@ namespace WebApi
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ICryptoManager, CryptoManager>();
             services.AddSingleton<IFileManager, FileManager>();
-            services.AddSingleton<IMQBroker, MQBrokerFile>();
+            services.AddSingleton<IMQBroker, MqBrokerFile>();
             services.AddSingleton<ICustomMemoryCache, CustomMemoryCache>();
         }
 
@@ -62,7 +62,7 @@ namespace WebApi
 
             hostAppLifetime.ApplicationStopped.Register(() =>  {
                 var fileManager = app.ApplicationServices.GetService<IFileManager>();
-                fileManager.DelteFiles();
+                fileManager.DeleteFiles();
             });
         }
 

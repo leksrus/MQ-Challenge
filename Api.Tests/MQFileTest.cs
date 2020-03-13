@@ -14,7 +14,7 @@ namespace Api.Tests
     public class MQFileTest
     {
         private readonly IMock<IFileManager> _fileManagerMock;
-        private readonly IMock<ILogger<MQBrokerFile>> _loggerMock;
+        private readonly IMock<ILogger<MqBrokerFile>> _loggerMock;
         private const string _idGet = "ZaQy256UWxiqKRATOfqdpw==";
         private const string _idPost = "UIsUuc5RHRk4BDlkh3U5jg==";
         private const string _idPut = "QChzkiZu4ybYQxWatg8ZkQ==";
@@ -24,13 +24,13 @@ namespace Api.Tests
         public MQFileTest()
         {
             _fileManagerMock = new Mock<IFileManager>();
-            _loggerMock = new Mock<ILogger<MQBrokerFile>>();
+            _loggerMock = new Mock<ILogger<MqBrokerFile>>();
         }
 
         [Fact]
         public void ParseGetMessage()
         {
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var msg = new Message
             {
                 Id = _idGet,
@@ -46,7 +46,7 @@ namespace Api.Tests
         [Fact]
         public void ParseDeleteMessage()
         {
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var msg = new Message
             {
                 Id = _idDelete,
@@ -62,7 +62,7 @@ namespace Api.Tests
         [Fact]
         public void ParsePostMessage()
         {
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var msg = new Message
             {
                 Id = _idPost,
@@ -79,7 +79,7 @@ namespace Api.Tests
         [Fact]
         public void ParsePutMessage()
         {
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var msg = new Message
             {
                 Id = _idPut,
@@ -96,7 +96,7 @@ namespace Api.Tests
         [Fact]
         public void ParsePatchMessage()
         {
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var msg = new Message
             {
                 Id = _idPatch,
@@ -125,7 +125,7 @@ namespace Api.Tests
                     Name = "T-Shirt"
                 }
             };
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -154,7 +154,7 @@ namespace Api.Tests
                     Name = string.Empty
                 }
             };
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -183,7 +183,7 @@ namespace Api.Tests
                     Name = "T-Shirt"
                 }
             };
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -212,7 +212,7 @@ namespace Api.Tests
                     Name = string.Empty
                 }
             };
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -241,7 +241,7 @@ namespace Api.Tests
                     Name = string.Empty
                 }
             };
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -270,7 +270,7 @@ namespace Api.Tests
                     Name = string.Empty
                 }
             };
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -299,7 +299,7 @@ namespace Api.Tests
                     Name = string.Empty
                 }
             };
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -328,7 +328,7 @@ namespace Api.Tests
                     Name = string.Empty
                 }
             };
-            var mqBroker = new MQBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
