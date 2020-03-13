@@ -112,10 +112,10 @@ namespace Api.Services
         public async Task<string[]> GetAllLinesAsync()
         {
             _logger.LogInformation("Getting text");
-            var fileMQ = _options.Value.FilesRoute + _options.Value.OutputData;
+            var fileMq = _options.Value.FilesRoute + _options.Value.OutputData;
             try
             {
-                var lines = await File.ReadAllLinesAsync(fileMQ);
+                var lines = await File.ReadAllLinesAsync(fileMq);
                 _logger.LogInformation("Get messages Ok");
 
                 return lines;
