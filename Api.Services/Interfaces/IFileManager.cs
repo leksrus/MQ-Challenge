@@ -7,7 +7,9 @@ namespace Api.Services.Interfaces
     {
         bool CreateFile();
 
-        bool DelteFiles();
+        bool DeleteFiles();
+
+        string[] GetFiles();
 
         Task<bool> SaveToFileAsync(string message);
 

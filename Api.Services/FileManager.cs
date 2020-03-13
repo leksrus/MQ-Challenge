@@ -25,6 +25,14 @@ namespace Api.Services
             var output = _options.Value.FilesRoute + _options.Value.OutputData;
             try
             {
+                if (!Directory.Exists(_options.Value.FilesRoute))
+                {
+                    _logger.LogInformation("Files creation failed. Route not exist");
+
+                    return false;
+                }
+
+                Directory.CreateDirectory(_options.Value.FilesRoute);
                 File.Create(input).Dispose();
                 File.Create(output).Dispose();
                 _logger.LogInformation("Files created");
@@ -39,9 +47,16 @@ namespace Api.Services
             }
         }
 
-        public bool DelteFiles()
+        public bool DeleteFiles()
         {
-            var files = Directory.GetFiles(_options.Value.FilesRoute);
+            if (!Directory.Exists(_options.Value.FilesRoute))
+            {
+                _logger.LogInformation("Files delete failed. Route not exist");
+
+                return false;
+            }
+
+            var files = GetFiles();
             try
             {
                 foreach (var file in files)
@@ -60,8 +75,20 @@ namespace Api.Services
             }
         }
 
+        public string[] GetFiles()
+        {
+            return Directory.GetFiles(_options.Value.FilesRoute);
+        }
+
         public async Task<bool> SaveToFileAsync(string message)
         {
+            if (!Directory.Exists(_options.Value.FilesRoute))
+            {
+                _logger.LogInformation("Save file failed. Route not exist");
+
+                return false;
+            }
+
             var fileMQ = _options.Value.FilesRoute + _options.Value.InputData;
             _logger.LogInformation("Saving message to file");
 
@@ -85,7 +112,7 @@ namespace Api.Services
         public async Task<string[]> GetAllLinesAsync()
         {
             _logger.LogInformation("Getting text");
-            var fileMQ = _options.Value.FilesRoute + _options.Value.InputData;
+            var fileMQ = _options.Value.FilesRoute + _options.Value.OutputData;
             try
             {
                 var lines = await File.ReadAllLinesAsync(fileMQ);
@@ -96,7 +123,7 @@ namespace Api.Services
             catch (Exception ex)
             {
                 _logger.LogInformation("Fail to get text: " + ex.Message);
-               return new string [0];
+                return new string[0];
             }
 
 
