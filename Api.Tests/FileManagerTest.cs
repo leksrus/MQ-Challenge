@@ -1,4 +1,5 @@
 ﻿using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using Api.Entitys;
 using Api.Services;
@@ -13,33 +14,28 @@ namespace Api.Tests
     public class FileManagerTest
     {
         private readonly IMock<ILogger<FileManager>> _loggerMock;
-        private readonly MQConfig _mqConfig;
         private const string FileRoute = @"TestMQFiles\";
-        private const string ImputData = "MQBrokerInputDataTest.csv";
+        private readonly string _completeRoute;
+        private const string InputData = "MQBrokerInputDataTest.csv";
         private const string OutputData = "MQBrokerOutputDataTest.csv";
 
 
         public FileManagerTest()
         {
             _loggerMock = new Mock<ILogger<FileManager>>();
-            _mqConfig = new MQConfig
-            {
-                FilesRoute = Path.Combine(Directory.GetCurrentDirectory(), FileRoute),
-                InputData = ImputData,
-                OutputData = OutputData
-            };
+            _completeRoute = Path.Combine(Directory.GetCurrentDirectory(), FileRoute);
         }
 
         [Fact]
         public void FileCreationCheck()
         {
-            var optionsMock = SetIOptionMock();
-            var mqBroker = new FileManager(optionsMock.Object, _loggerMock.Object);
-            var createFileResult = mqBroker.CreateFile();
-            var isExistInputFile = File.Exists(Path.Combine(optionsMock.Object.Value.FilesRoute, optionsMock.Object.Value.InputData));
-            var isExistOutputFileName = File.Exists(Path.Combine(optionsMock.Object.Value.FilesRoute, optionsMock.Object.Value.OutputData));
+            var mqBroker = new FileManager(_loggerMock.Object);
+            mqBroker.CreateFile(InputData, _completeRoute);
+            mqBroker.CreateFile(OutputData, _completeRoute);
+            var isExistInputFile = File.Exists(Path.Combine(_completeRoute, InputData));
+            var isExistOutputFileName = File.Exists(Path.Combine(_completeRoute, OutputData));
 
-            var result = createFileResult && isExistInputFile && isExistOutputFileName;
+            var result = isExistInputFile && isExistOutputFileName;
 
             Assert.True(result);
         }
@@ -47,18 +43,16 @@ namespace Api.Tests
         [Fact]
         public void FileDeleteCheck()
         {
-            var optionsMock = SetIOptionMock();
             var fileManagerMock = Mock.Of<IFileManager>();
-            Mock.Get(fileManagerMock).Setup(x => x.GetFiles()).Returns(() =>
-
-                new[] { ImputData, OutputData }
+            Mock.Get(fileManagerMock).Setup(x => x.GetFiles(_completeRoute)).Returns(() =>
+                new[] {InputData, OutputData}
             );
-            var mqBroker = new FileManager(optionsMock.Object, _loggerMock.Object);
-            var deleteFileResult = mqBroker.DeleteFiles();
-            var inputFileName = File.Exists(Path.Combine(optionsMock.Object.Value.FilesRoute, optionsMock.Object.Value.InputData));
-            var outputFileName = File.Exists(Path.Combine(optionsMock.Object.Value.FilesRoute, optionsMock.Object.Value.OutputData));
+            var mqBroker = new FileManager(_loggerMock.Object);
+            mqBroker.DeleteFiles(_completeRoute);
+            var inputFileName = File.Exists(Path.Combine(_completeRoute, InputData));
+            var outputFileName = File.Exists(Path.Combine(_completeRoute, OutputData));
 
-            var result = deleteFileResult && !inputFileName && !outputFileName;
+            var result = !inputFileName && !outputFileName;
 
             Assert.True(result);
         }
@@ -66,12 +60,11 @@ namespace Api.Tests
         [Fact]
         public async Task WriteToFile()
         {
-            var optionsMock = SetIOptionMock();
-            var mqBroker = new FileManager(optionsMock.Object, _loggerMock.Object);
+            var mqBroker = new FileManager(_loggerMock.Object);
             var message = "Test message";
-            var isFileCreated = await mqBroker.SaveToFileAsync(message);
-            var lines = await File.ReadAllLinesAsync(Path.Combine(optionsMock.Object.Value.FilesRoute,
-                optionsMock.Object.Value.InputData));
+            mqBroker.CreateFile(InputData, _completeRoute);
+            var isFileCreated = await mqBroker.SaveToFileAsync(message, InputData, _completeRoute);
+            var lines = await File.ReadAllLinesAsync(Path.Combine(_completeRoute, InputData));
 
             Assert.True(isFileCreated);
             Assert.Equal(message, lines[0]);
@@ -80,23 +73,15 @@ namespace Api.Tests
         [Fact]
         public async Task ReadFromFile()
         {
-            var optionsMock = SetIOptionMock();
-            var mqBroker = new FileManager(optionsMock.Object, _loggerMock.Object);
-            await using var file = new StreamWriter(Path.Combine(optionsMock.Object.Value.FilesRoute, optionsMock.Object.Value.OutputData), true);
+            var mqBroker = new FileManager(_loggerMock.Object);
+            mqBroker.CreateFile(OutputData, _completeRoute);
+            await using var file = new StreamWriter(Path.Combine(_completeRoute, OutputData), true);
             var message = "Test message";
             await file.WriteLineAsync(message);
             file.Close();
-            var lines = await mqBroker.GetAllLinesAsync();
+            var lines = await mqBroker.GetAllLinesAsync(OutputData, _completeRoute);
 
             Assert.Equal(message, lines[0]);
-        }
-
-        private Mock<IOptions<MQConfig>> SetIOptionMock()
-        {
-            var optionsMock = new Mock<IOptions<MQConfig>>();
-            optionsMock.Setup(ap => ap.Value).Returns(_mqConfig);
-
-            return optionsMock;
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 
 namespace Api.Services
 {
@@ -13,17 +14,19 @@ namespace Api.Services
     {
         private readonly IFileManager _fileManager;
         private readonly ILogger<MqBrokerFile> _logger;
+        private readonly IOptions<MQConfig> _options;
 
-        public MqBrokerFile(IFileManager fileManager, ILogger<MqBrokerFile> logger)
+        public MqBrokerFile(IFileManager fileManager, ILogger<MqBrokerFile> logger, IOptions<MQConfig> options)
         {
             _fileManager = fileManager;
             _logger = logger;
+            _options = options;
         }
 
         public async Task<List<Message>> GetMessages()
         {
             _logger.LogInformation("Getting messages");
-            var lines = await _fileManager.GetAllLinesAsync();
+            var lines = await _fileManager.GetAllLinesAsync(_options.Value.OutputData, _options.Value.FilesRoute);
             var messages = new List<Message>();
 
             foreach (var t in lines)
@@ -49,7 +52,7 @@ namespace Api.Services
         {
             _logger.LogInformation("Putting message");
 
-            var result = await _fileManager.SaveToFileAsync(MessageToString(message));
+            var result = await _fileManager.SaveToFileAsync(MessageToString(message), _options.Value.InputData, _options.Value.FilesRoute);
 
             if (result)
             {

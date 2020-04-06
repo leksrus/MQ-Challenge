@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace WebApi
 {
@@ -54,15 +55,17 @@ namespace WebApi
             {
                 endpoints.MapControllers();
             });
-
+            var serviceProvider = app.ApplicationServices;
+            var hostingEnv = serviceProvider.GetService<IOptions<MQConfig>>();
             hostAppLifetime.ApplicationStarted.Register(() =>  {
                 var fileManager = app.ApplicationServices.GetService<IFileManager>();
-                fileManager.CreateFile();
+                fileManager.CreateFile(hostingEnv.Value.FilesRoute, hostingEnv.Value.InputData);
+                fileManager.CreateFile(hostingEnv.Value.FilesRoute, hostingEnv.Value.OutputData);
             });
 
             hostAppLifetime.ApplicationStopped.Register(() =>  {
                 var fileManager = app.ApplicationServices.GetService<IFileManager>();
-                fileManager.DeleteFiles();
+                fileManager.DeleteFiles(hostingEnv.Value.FilesRoute);
             });
         }
 

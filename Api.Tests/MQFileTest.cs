@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace Api.Tests
@@ -15,6 +16,7 @@ namespace Api.Tests
     {
         private readonly IMock<IFileManager> _fileManagerMock;
         private readonly IMock<ILogger<MqBrokerFile>> _loggerMock;
+        private readonly Mock<IOptions<MQConfig>> _ioptions;
         private const string _idGet = "ZaQy256UWxiqKRATOfqdpw==";
         private const string _idPost = "UIsUuc5RHRk4BDlkh3U5jg==";
         private const string _idPut = "QChzkiZu4ybYQxWatg8ZkQ==";
@@ -25,12 +27,14 @@ namespace Api.Tests
         {
             _fileManagerMock = new Mock<IFileManager>();
             _loggerMock = new Mock<ILogger<MqBrokerFile>>();
+            _ioptions = new Mock<IOptions<MQConfig>>();
+            SetUpMqConfigMock();
         }
 
         [Fact]
         public void ParseGetMessage()
         {
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var msg = new Message
             {
                 Id = _idGet,
@@ -46,7 +50,7 @@ namespace Api.Tests
         [Fact]
         public void ParseDeleteMessage()
         {
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var msg = new Message
             {
                 Id = _idDelete,
@@ -62,7 +66,7 @@ namespace Api.Tests
         [Fact]
         public void ParsePostMessage()
         {
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var msg = new Message
             {
                 Id = _idPost,
@@ -79,7 +83,7 @@ namespace Api.Tests
         [Fact]
         public void ParsePutMessage()
         {
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var msg = new Message
             {
                 Id = _idPut,
@@ -96,7 +100,7 @@ namespace Api.Tests
         [Fact]
         public void ParsePatchMessage()
         {
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var msg = new Message
             {
                 Id = _idPatch,
@@ -114,7 +118,7 @@ namespace Api.Tests
         public async Task GetMessageOK()
         {
             var mockFileManager = _fileManagerMock as Mock<IFileManager>;
-            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(GetResponseMessage());
+            mockFileManager.Setup(m => m.GetAllLinesAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(GetResponseMessage());
             var msg = new Message
             {
                 Id = _idGet,
@@ -125,7 +129,7 @@ namespace Api.Tests
                     Name = "T-Shirt"
                 }
             };
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -143,7 +147,7 @@ namespace Api.Tests
         public async Task GetMessageEmpty()
         {
             var mockFileManager = _fileManagerMock as Mock<IFileManager>;
-            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(GetResponseMessageEmpty());
+            mockFileManager.Setup(m => m.GetAllLinesAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(GetResponseMessageEmpty());
             var msg = new Message
             {
                 Id = _idGet,
@@ -154,7 +158,7 @@ namespace Api.Tests
                     Name = string.Empty
                 }
             };
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -172,7 +176,7 @@ namespace Api.Tests
         public async Task PostMessage()
         {
             var mockFileManager = _fileManagerMock as Mock<IFileManager>;
-            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(PostResponseMessage());
+            mockFileManager.Setup(m => m.GetAllLinesAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(PostResponseMessage());
             var msg = new Message
             {
                 Id = _idPost,
@@ -183,7 +187,7 @@ namespace Api.Tests
                     Name = "T-Shirt"
                 }
             };
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -201,7 +205,7 @@ namespace Api.Tests
         public async Task PostMessageError()
         {
             var mockFileManager = _fileManagerMock as Mock<IFileManager>;
-            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(PostResponseMessageError());
+            mockFileManager.Setup(m => m.GetAllLinesAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(PostResponseMessageError());
             var msg = new Message
             {
                 Id = _idPost,
@@ -212,7 +216,7 @@ namespace Api.Tests
                     Name = string.Empty
                 }
             };
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -230,7 +234,7 @@ namespace Api.Tests
         public async Task PatchMessage()
         {
             var mockFileManager = _fileManagerMock as Mock<IFileManager>;
-            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(PatchResponseMessage());
+            mockFileManager.Setup(m => m.GetAllLinesAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(PatchResponseMessage());
             var msg = new Message
             {
                 Id = _idPatch,
@@ -241,7 +245,7 @@ namespace Api.Tests
                     Name = string.Empty
                 }
             };
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -259,7 +263,7 @@ namespace Api.Tests
         public async Task PatchMessageError()
         {
             var mockFileManager = _fileManagerMock as Mock<IFileManager>;
-            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(PatchResponseMessageError());
+            mockFileManager.Setup(m => m.GetAllLinesAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(PatchResponseMessageError());
             var msg = new Message
             {
                 Id = _idPatch,
@@ -270,7 +274,7 @@ namespace Api.Tests
                     Name = string.Empty
                 }
             };
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -288,7 +292,7 @@ namespace Api.Tests
         public async Task DeleteMessage()
         {
             var mockFileManager = _fileManagerMock as Mock<IFileManager>;
-            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(DeleteResponseMessage());
+            mockFileManager.Setup(m => m.GetAllLinesAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(DeleteResponseMessage());
             var msg = new Message
             {
                 Id = _idDelete,
@@ -299,7 +303,7 @@ namespace Api.Tests
                     Name = string.Empty
                 }
             };
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -317,7 +321,7 @@ namespace Api.Tests
         public async Task DeleteMessageError()
         {
             var mockFileManager = _fileManagerMock as Mock<IFileManager>;
-            mockFileManager.Setup(m => m.GetAllLinesAsync()).ReturnsAsync(DeleteResponseMessageError());
+            mockFileManager.Setup(m => m.GetAllLinesAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(DeleteResponseMessageError());
             var msg = new Message
             {
                 Id = _idDelete,
@@ -328,7 +332,7 @@ namespace Api.Tests
                     Name = string.Empty
                 }
             };
-            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object);
+            var mqBroker = new MqBrokerFile(_fileManagerMock.Object, _loggerMock.Object, _ioptions.Object);
             var message = await mqBroker.GetMessages();
 
             var expected = JsonSerializer.Serialize(msg);
@@ -340,6 +344,12 @@ namespace Api.Tests
         private string[] DeleteResponseMessageError()
         {
             return new[] { $"400;{_idDelete};0;;" };
+        }
+        
+        private void SetUpMqConfigMock()
+        {
+            var mqConfig = new MQConfig();
+            _ioptions.Setup(ap => ap.Value).Returns(mqConfig);
         }
     }
 }
