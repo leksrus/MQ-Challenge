@@ -17,15 +17,17 @@ namespace WebApi.Controllers
         private readonly ICryptoManager _cryptoManager;
         private readonly IMapper _mapper;
         private readonly IMQBroker _mqBroker;
+        private readonly ICustomMemoryCache _customMemoryCache;
 
         public ProductController(ILogger<ProductController> logger, IHttpContextAccessor httpContextAccessor, ICryptoManager cryptoManager, IMapper mapper,
-                                  IMQBroker mqBroker)
+                                  IMQBroker mqBroker, ICustomMemoryCache customMemoryCache)
         {
             _logger = logger;
             _httpContextAccessor = httpContextAccessor;
             _cryptoManager = cryptoManager;
             _mapper = mapper;
             _mqBroker = mqBroker;
+            _customMemoryCache = customMemoryCache;
         }
 
         [HttpGet("{idProduct}")]
@@ -82,8 +84,8 @@ namespace WebApi.Controllers
             return Ok();
         }
 
-        [HttpDelete]
-        public IActionResult Delete()
+        [HttpDelete("{idProduct}")]
+        public IActionResult Delete(int idProduct)
         {
             var url = nameof(HttpMethods.Delete) + " Request " + UrlCustomHelperExtensions.AbsoluteUrl(_httpContextAccessor);
             var keyRequest = _cryptoManager.GetMD5Hash(url);

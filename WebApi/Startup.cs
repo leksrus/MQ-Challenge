@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace WebApi
 {
@@ -24,6 +25,7 @@ namespace WebApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddMemoryCache();
 
             services.AddAutoMapper(typeof(Startup));
             services.Configure<MQConfig>(_configuration.GetSection("MQConfig"));
@@ -31,7 +33,8 @@ namespace WebApi
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddSingleton<ICryptoManager, CryptoManager>();
             services.AddSingleton<IFileManager, FileManager>();
-            services.AddSingleton<IMQBroker, MQBrokerFile>();
+            services.AddSingleton<IMQBroker, MqBrokerFile>();
+            services.AddSingleton<ICustomMemoryCache, CustomMemoryCache>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,15 +55,17 @@ namespace WebApi
             {
                 endpoints.MapControllers();
             });
-
+            var serviceProvider = app.ApplicationServices;
+            var hostingEnv = serviceProvider.GetService<IOptions<MQConfig>>();
             hostAppLifetime.ApplicationStarted.Register(() =>  {
-                var fileManager = (IFileManager)app.ApplicationServices.GetService(typeof(IFileManager));
-                fileManager.CreateFile();
+                var fileManager = app.ApplicationServices.GetService<IFileManager>();
+                fileManager.CreateFile(hostingEnv.Value.FilesRoute, hostingEnv.Value.InputData);
+                fileManager.CreateFile(hostingEnv.Value.FilesRoute, hostingEnv.Value.OutputData);
             });
 
             hostAppLifetime.ApplicationStopped.Register(() =>  {
-                var fileManager = (IFileManager)app.ApplicationServices.GetService(typeof(IFileManager));
-                fileManager.DelteFiles();
+                var fileManager = app.ApplicationServices.GetService<IFileManager>();
+                fileManager.DeleteFiles(hostingEnv.Value.FilesRoute);
             });
         }
 

@@ -9,5 +9,7 @@ namespace Api.Services.Interfaces
         Task<bool> PutMessage(Message message);
 
         Task<List<Message>> GetMessages();
+
+        string MessageToString(object obj);
     }
 }
